@@ -3,7 +3,7 @@ import React, { useState } from "react";
 import Button from "../global/Bouton";
 import Connexion from "../connexion/Connexion";
 
-const Menu = () => {
+const MenuClient = () => {
   const [showModal, setShowModal] = useState(false);
 
   const handleShowModal = () => {
@@ -31,4 +31,4 @@ const Menu = () => {
   );
 };
 
-export default Menu;
+export default MenuClient;
