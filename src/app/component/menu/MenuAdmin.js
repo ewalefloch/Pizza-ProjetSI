@@ -1,6 +1,5 @@
-'use client';
-
-const MenuAdmin = () => {
+"use client";
+const MenuAdmin = ({ setActiveSection }) => {
   return (
     <div
       className="absolute top-0 left-0 w-full flex justify-start items-center p-6"
@@ -12,6 +11,7 @@ const MenuAdmin = () => {
           <li>
             <button
               className="text-white hover:text-orange-300"
+              onClick={() => setActiveSection("pizzas")}
             >
               Gestion Pizzas
             </button>
@@ -19,6 +19,7 @@ const MenuAdmin = () => {
           <li>
             <button
               className="text-white hover:text-orange-300"
+              onClick={() => setActiveSection("ingredients")}
             >
               Gestion Ingrédients
             </button>

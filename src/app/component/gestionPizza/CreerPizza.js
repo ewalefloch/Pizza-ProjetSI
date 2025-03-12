@@ -45,7 +45,7 @@ const CreerPizza = ({ ingredients, ajouterPizza, fermer }) => {
       }
 
       const nouvellePizza = await response.json();
-      ajouterPizza(nouvellePizza);
+      ajouterPizza(nouvellePizza.data);
 
       setNom("");
       setPrix("");
