@@ -4,6 +4,7 @@ import MenuAdmin from "../component/menu/MenuAdmin";
 import API_ROUTES from "../configAPIRoute";
 import GestionPizzas from "../component/gestionPizza/GestionPizzas";
 import GestionIngredients from "../component/gestionIngredient/GestionIngredient";
+import GestionCommentaires from "../component/gestionCommentaire/GestionCommentaire";
 
 export default function Home() {
   const [pizzas, setPizzas] = useState([]);
@@ -94,6 +95,10 @@ export default function Home() {
             ajouterIngredient={ajouterIngredient}
           />
         )}
+        {activeSection === "commentaires" && (
+          <GestionCommentaires pizzas={pizzas} />
+        )}
+
       </div>
     </div>
   );

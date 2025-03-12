@@ -7,7 +7,7 @@ const MenuAdmin = ({ setActiveSection }) => {
     >
       <h1 className="text-2xl text-white font-bold mr-6 pr-3 border-r-2 border-white">Administration</h1>
       <nav>
-        <ul className="flex space-x-4">
+        <ul className="flex space-x-6">
           <li>
             <button
               className="text-white hover:text-orange-300"
@@ -22,6 +22,30 @@ const MenuAdmin = ({ setActiveSection }) => {
               onClick={() => setActiveSection("ingredients")}
             >
               Gestion Ingrédients
+            </button>
+          </li>
+          <li>
+            <button
+              className="text-white hover:text-orange-300"
+              onClick={() => setActiveSection("commentaires")}
+            >
+              Gestion Commentaires
+            </button>
+          </li>
+          <li>
+            <button
+              className="text-white hover:text-orange-300"
+              onClick={() => setActiveSection("comptes")}
+            >
+              Gestion Comptes
+            </button>
+          </li>
+          <li>
+            <button
+              className="text-white hover:text-orange-300"
+              onClick={() => setActiveSection("statitisques")}
+            >
+              Statitisques
             </button>
           </li>
         </ul>
