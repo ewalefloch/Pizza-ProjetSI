@@ -5,6 +5,9 @@ const API_ROUTES = {
     INGREDIENT: `${API_ROUTE}/ingredient`,
     COMMENTAIRE: `${API_ROUTE}/commentaire`,
     COMMANDE: `${API_ROUTE}/commande`,
+    LOGIN: `${API_ROUTE}/login`,
+    REGISTER: `${API_ROUTE}/register`,
+    USERS: `${API_ROUTE}/users`,
 }
 
 export default API_ROUTES;
