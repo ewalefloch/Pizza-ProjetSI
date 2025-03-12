@@ -1,5 +1,7 @@
 'use client';
 
+import Link from "next/link";
+
 const MenuAdmin = () => {
   return (
     <div
@@ -22,6 +24,13 @@ const MenuAdmin = () => {
             >
               Gestion Ingrédients
             </button>
+          </li>
+          <li>
+            <Link href="/admin/users">
+            <button className="text-white hover:text-orange-300">
+              Gestion Utilisateurs
+            </button>
+            </Link>
           </li>
         </ul>
       </nav>
