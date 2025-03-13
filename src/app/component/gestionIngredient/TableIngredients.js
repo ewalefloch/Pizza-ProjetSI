@@ -9,6 +9,7 @@ const TableauIngredients = ({ ingredients, supprimerIngredient }) => {
             <th className="border border-gray-300 px-4 py-2">Nom</th>
             <th className="border border-gray-300 px-4 py-2">Description</th>
             <th className="border border-gray-300 px-4 py-2">Prix</th>
+            <th className="border border-gray-300 px-4 py-2">Image</th>
             <th className="border border-gray-300 px-4 py-2">Forme SVG</th>
             <th className="border border-gray-300 px-4 py-2">Actions</th>
           </tr>
@@ -21,6 +22,13 @@ const TableauIngredients = ({ ingredients, supprimerIngredient }) => {
                 <td className="border border-gray-300 px-4 py-2">{ingredient.description}</td>
                 <td className="border border-gray-300 px-4 py-2">{ingredient.prix} €</td>
                 <td className="border border-gray-300 px-4 py-2">
+                  <img
+                      src={ingredient.image}
+                      alt={`Image de ${ingredient.nom}`}
+                      className="w-12 h-12 object-cover"
+                  />
+                </td>
+                  <td className="border border-gray-300 px-4 py-2">
                   <div
                     dangerouslySetInnerHTML={{ __html: ingredient.formeSvg }}
                     className="w-12 h-12"

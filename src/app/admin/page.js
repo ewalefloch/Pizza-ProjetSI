@@ -13,21 +13,26 @@ export default function Home() {
   const [activeSection, setActiveSection] = useState("pizzas"); 
 
   // Charger les pizzas et ingrédients
-  useEffect(() => {
-    Promise.all([
-      fetch(API_ROUTES.PIZZA).then((response) => response.json()),
-      fetch(API_ROUTES.INGREDIENT).then((response) => response.json())
-    ])
-      .then(([pizzasData, ingredientsData]) => {
-        setPizzas(pizzasData.data);
-        setIngredients(ingredientsData.data);
-        setIsLoading(false);
-      })
-      .catch((error) => {
-        console.error("Erreur lors de la récupération des données", error);
-        setIsLoading(false);
-      });
-  }, []);
+    useEffect(() => {
+        Promise.all([
+            fetch(API_ROUTES.PIZZA, { credentials: "include" }).then((response) => response.json()),
+            fetch(API_ROUTES.INGREDIENT, { credentials: "include" }).then((response) => response.json())
+        ])
+            .then(([pizzasData, ingredientsData]) => {  // Mise à jour des ingrédients avec les images
+                const ingredientsWithImages = ingredientsData.data.map((ingredient) => ({
+                    ...ingredient,
+                    image: `${API_ROUTES.INGREDIENT}/images/${ingredient.id}`,
+                }));
+
+                setPizzas(pizzasData.data);
+                setIngredients(ingredientsWithImages);
+                setIsLoading(false);
+            })
+            .catch((error) => {
+                console.error("Erreur lors de la récupération des données", error);
+                setIsLoading(false);
+            });
+    }, []);
 
   const ajouterPizza = (nouvellePizza) => {
     if (!nouvellePizza) {
@@ -40,7 +45,7 @@ export default function Home() {
 
   const supprimerPizza = async (id) => {
     try {
-      await fetch(`${API_ROUTES.PIZZA}/${id}`, { method: "DELETE" });
+      await fetch(`${API_ROUTES.PIZZA}/${id}`, { method: "DELETE", credentials: "include" });
       setPizzas((prev) => prev.filter((pizza) => pizza.id !== id));
     } catch (error) {
       console.error("Erreur suppression pizza", error);
@@ -58,7 +63,7 @@ export default function Home() {
 
   const supprimerIngredient = async (id) => {
     try {
-      await fetch(`${API_ROUTES.INGREDIENT}/${id}`, { method: "DELETE" });
+      await fetch(`${API_ROUTES.INGREDIENT}/${id}`, { method: "DELETE", credentials: "include"  });
       setIngredients((prev) => prev.filter((ingredient) => ingredient.id !== id));
     } catch (error) {
       console.error("Erreur suppression ingrédient", error);
