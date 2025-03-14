@@ -3,6 +3,7 @@ import React, {useEffect, useState} from "react";
 import Button from "../global/Bouton";
 import Connexion from "../connexion/Connexion";
 import API_ROUTES from "@/app/configAPIRoute";
+import PROXY_ROUTES from "@/app/configProxyRoute";
 
 
 const getCookie = (cookieName) => {
@@ -26,7 +27,7 @@ const MenuClient = () => {
 
   const handleDeconnexion = async () => {
     try {
-      const response = await fetch(API_ROUTES.LOGIN, {
+      const response = await fetch(PROXY_ROUTES.LOGIN, {
         method: "DELETE",
         credentials: "include",
       });

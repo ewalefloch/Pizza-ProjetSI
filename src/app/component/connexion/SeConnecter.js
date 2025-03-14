@@ -2,6 +2,7 @@
 
 import React, { useState } from "react";
 import API_ROUTES from "../../configAPIRoute";
+import PROXY_ROUTES from "@/app/configProxyRoute";
 
 const SeConnecter = () => {
     const [nom, setNom] = useState("");
@@ -22,7 +23,7 @@ const SeConnecter = () => {
         };
 
         try {
-            const response = await fetch(API_ROUTES.LOGIN, {
+            const response = await fetch(PROXY_ROUTES.LOGIN, {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json",
