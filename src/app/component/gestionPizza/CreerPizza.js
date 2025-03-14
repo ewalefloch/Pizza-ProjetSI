@@ -13,7 +13,7 @@ const CreerPizza = ({ ingredients, ajouterPizza, fermer }) => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-
+  
     if (!nom || !prix || !description || selectedIngredients.length === 0) {
       setMessage({
         type: "error",
@@ -21,44 +21,49 @@ const CreerPizza = ({ ingredients, ajouterPizza, fermer }) => {
       });
       return;
     }
-
-    const ingredientsData = selectedIngredients.map((id) => ({ id }));
-
+  
+    const formData = new FormData();
     const pizzaData = {
       id: null,
       nom,
       description,
-      photo: "url-photo-temporaire", // TODO : Gérer l'upload d'image
       prix: parseFloat(prix),
-      ingredients_principaux: ingredientsData,
+      ingredients_principaux: selectedIngredients.map((id) => ({ id })),
     };
-
+  
+    formData.append("pizza", new Blob([JSON.stringify(pizzaData)], { type: "application/json" }));
+    
+    if (photo) {
+      formData.append("image", photo);
+    }
+  
     try {
       const response = await fetch(API_ROUTES.PIZZA, {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(pizzaData),
+        body: formData, // Envoi en multipart/form-data
       });
-
+  
       if (!response.ok) {
         throw new Error("Erreur lors de l'ajout de la pizza !");
       }
-
+  
       const nouvellePizza = await response.json();
       ajouterPizza(nouvellePizza.data);
-
+  
       setNom("");
       setPrix("");
       setDescription("");
       setSelectedIngredients([]);
+      setPhoto(null);
       setMessage({ type: "success", text: "Pizza ajoutée avec succès !" });
-
-      setTimeout(() => setMessage({ type: "", text: "" }), 3000); // Effacer après 3s
+  
+      setTimeout(() => setMessage({ type: "", text: "" }), 3000);
     } catch (error) {
       setMessage({ type: "error", text: "Une erreur est survenue !" });
       console.error("Erreur:", error);
     }
   };
+  
 
   return (
     <div
