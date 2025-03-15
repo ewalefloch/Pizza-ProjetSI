@@ -1,8 +1,8 @@
-'use client'
-
 import React, { useState } from "react";
+import { getCookie } from "cookies-next";  // Utilise cookies-next pour accéder aux cookies
 import API_ROUTES from "../../configAPIRoute";
-import PROXY_ROUTES from "@/app/configProxyRoute";
+import PROXY_ROUTE from "../../configProxyRoute";
+import { jwtDecode } from 'jwt-decode';
 
 const SeConnecter = () => {
     const [nom, setNom] = useState("");
@@ -23,7 +23,7 @@ const SeConnecter = () => {
         };
 
         try {
-            const response = await fetch(PROXY_ROUTES.LOGIN, {
+            const response = await fetch(PROXY_ROUTE.LOGIN, {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json",
@@ -37,16 +37,27 @@ const SeConnecter = () => {
             }
 
             const utilisateur = await response.json();
+            console.log("Utilisateur connecté:", utilisateur);
+
+            // Décoder le token pour récupérer l'ID de l'utilisateur
+            const token = getCookie('AuthToken'); // Récupérer le token stocké dans les cookies
+            console.log("Token:", token);
+            if (token) {
+                const decodedToken = jwtDecode(token);  // Décoder le token
+                const userId = decodedToken.userId;  // Supposons que l'ID utilisateur est dans la propriété 'id' du token
+                console.log("ID de l'utilisateur depuis le token:", userId);
+
+                // Création ou récupération du panier avec l'ID de l'utilisateur
+                await gestionPanier(userId);
+            }
 
             setMessage({ type: "success", text: "Connexion réussie !" });
-
             setNom("");
             setMdp("");
 
             setTimeout(() => {
                 window.location.reload(); // Recharge la page actuelle
             }, 1000);
-
 
             setTimeout(() => setMessage({ type: "", text: "" }), 3000);
         } catch (error) {
@@ -58,37 +69,57 @@ const SeConnecter = () => {
         }
     };
 
+    // Fonction pour gérer la création ou la récupération du panier
+    const gestionPanier = async (userId) => {
+        try {
+            const panierResponse = await fetch(`${API_ROUTES.PANIER}/user/${userId}`, {
+                credentials: "include", // Assure que les cookies sont inclus dans la requête
+            });
+    
+            if (!panierResponse.ok) {
+                throw new Error('Erreur lors de la récupération du panier');
+            }
+    
+            const panierData = await panierResponse.json();
+    
+            if (panierData.success && panierData.data) {
+                console.log("Panier récupéré", panierData.data);
+            } else {
+                console.error("Erreur avec les données du panier:", panierData.message);
+            }
+        } catch (error) {
+            console.error("Erreur lors de la gestion du panier:", error);
+        }
+    };
+    
 
-  return (
-    <form onSubmit={handleSubmit} className="space-y-4">
-      <input
-        placeholder="Pseudo"
-        value={nom}
-        onChange={(e) => setNom(e.target.value)}
-        className="w-full p-2 border border-gray-300"
-      />
-      <input
-        type="password"
-        placeholder="Mot de passe"
-        value={mdp}
-        onChange={(e) => setMdp(e.target.value)}
-        className="w-full p-2 border border-gray-300"
-      />
-      <button type="submit" className="w-full bg-orange-600 text-white p-2">
-        Se connecter
-      </button>
-        {message.text && (
-            <p
-                className={`p-2 rounded ${
-                    message.type === "error" ? "bg-red-500 text-white" : "bg-green-500 text-white"
-                }`}
-            >
-                {message.text}
-            </p>
-        )}
-
-    </form>
-  );
+    return (
+        <form onSubmit={handleSubmit} className="space-y-4">
+            <input
+                placeholder="Pseudo"
+                value={nom}
+                onChange={(e) => setNom(e.target.value)}
+                className="w-full p-2 border border-gray-300"
+            />
+            <input
+                type="password"
+                placeholder="Mot de passe"
+                value={mdp}
+                onChange={(e) => setMdp(e.target.value)}
+                className="w-full p-2 border border-gray-300"
+            />
+            <button type="submit" className="w-full bg-orange-600 text-white p-2">
+                Se connecter
+            </button>
+            {message.text && (
+                <p
+                    className={`p-2 rounded ${message.type === "error" ? "bg-red-500 text-white" : "bg-green-500 text-white"}`}
+                >
+                    {message.text}
+                </p>
+            )}
+        </form>
+    );
 };
 
 export default SeConnecter;
