@@ -1,4 +1,7 @@
+"use client";
+import React, { useEffect, useState } from "react";
 import MenuClient from "./component/menu/MenuClient";
+import API_ROUTES from "./configAPIRoute";
 import imagePizza from "../../public/image/pizza.jpg";
 import MenuPizza from "@/app/component/menu/MenuPizza";
 
@@ -25,3 +28,4 @@ export default function Home() {
         </div>
     );
 }
+

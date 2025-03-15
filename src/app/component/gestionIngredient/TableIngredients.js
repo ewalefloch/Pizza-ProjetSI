@@ -23,9 +23,10 @@ const TableauIngredients = ({ ingredients, supprimerIngredient }) => {
                 <td className="border border-gray-300 px-4 py-2">{ingredient.prix} €</td>
                 <td className="border border-gray-300 px-4 py-2">
                   <img
-                      src={ingredient.image}
+                      src={ingredient.image || "/image/ingredient.jpg" }
                       alt={`Image de ${ingredient.nom}`}
                       className="w-12 h-12 object-cover"
+                      onError={(e) => e.currentTarget.src ="/image/ingredient.jpg"}
                   />
                 </td>
                   <td className="border border-gray-300 px-4 py-2">
