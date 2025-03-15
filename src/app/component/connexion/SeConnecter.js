@@ -39,15 +39,13 @@ const SeConnecter = () => {
             const utilisateur = await response.json();
             console.log("Utilisateur connecté:", utilisateur);
 
-            // Décoder le token pour récupérer l'ID de l'utilisateur
-            const token = getCookie('AuthToken'); // Récupérer le token stocké dans les cookies
+            const token = getCookie('AuthToken');
             console.log("Token:", token);
             if (token) {
-                const decodedToken = jwtDecode(token);  // Décoder le token
-                const userId = decodedToken.userId;  // Supposons que l'ID utilisateur est dans la propriété 'id' du token
+                const decodedToken = jwtDecode(token);  
+                const userId = decodedToken.userId; 
                 console.log("ID de l'utilisateur depuis le token:", userId);
 
-                // Création ou récupération du panier avec l'ID de l'utilisateur
                 await gestionPanier(userId);
             }
 
@@ -73,7 +71,7 @@ const SeConnecter = () => {
     const gestionPanier = async (userId) => {
         try {
             const panierResponse = await fetch(`${API_ROUTES.PANIER}/user/${userId}`, {
-                credentials: "include", // Assure que les cookies sont inclus dans la requête
+                credentials: "include",
             });
     
             if (!panierResponse.ok) {

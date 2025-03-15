@@ -1,30 +1,23 @@
-'use client';
+"use client";
 import React, { useEffect, useState } from "react";
 import Button from "../global/Bouton";
 import Connexion from "../connexion/Connexion";
-import MenuPizza from "./MenuPizza"; // Importer MenuPizza
 import PROXY_ROUTES from "@/app/configProxyRoute";
+import { getCookie } from "cookies-next";
 
-const getCookie = (cookieName) => {
-  const cookies = document.cookie.split("; ");
-  const cookie = cookies.find((c) => c.startsWith(`${cookieName}=`));
-  return cookie ? cookie.split("=")[1] : null;
-};
+const MenuClient = ({ setActiveSection, setEstConnecte }) => {
+  const [showModal, setShowModal] = useState(false);
+  const [estConnecteLocal, setEstConnecteLocal] = useState(false);
 
-const MenuClient = () => {
-  const [showModal, setShowModal] = useState(false); // Contrôle de la fenêtre de connexion
-  const [showMenuPizza, setShowMenuPizza] = useState(false); // Contrôle pour afficher MenuPizza
-  const [estConnecte, setEstConnecte] = useState(false); // Vérifie si l'utilisateur est connecté
-
-  // Vérifie les cookies pour déterminer si l'utilisateur est connecté
   useEffect(() => {
-    const verifierCookie = () => {
-      const token = getCookie("AuthToken");
-      setEstConnecte(!!token); // Si le token existe, estConnecte est vrai
-    };
-
-    verifierCookie();
-  }, []);
+    const token = getCookie("AuthToken");
+    setEstConnecteLocal(!!token);
+    
+    // Vérifier si setEstConnecte est une fonction avant de l'appeler
+    if (typeof setEstConnecte === 'function') {
+      setEstConnecte(!!token); // Mettre à jour l'état parent
+    }
+  }, [setEstConnecte]);
 
   const handleDeconnexion = async () => {
     try {
@@ -34,8 +27,14 @@ const MenuClient = () => {
       });
 
       if (response.ok) {
-        setEstConnecte(false);
+        setEstConnecteLocal(false);
+        // Vérifier si setEstConnecte est une fonction avant de l'appeler
+        if (typeof setEstConnecte === 'function') {
+          setEstConnecte(false); // Mettre à jour l'état parent
+        }
         console.log("Déconnexion réussie !");
+        // Rediriger vers la page d'accueil après déconnexion
+        setActiveSection("menu");
       } else {
         console.error("Erreur lors de la déconnexion !");
       }
@@ -44,55 +43,70 @@ const MenuClient = () => {
     }
   };
 
-  const handleShowModal = () => {
-    setShowModal(true);
-  };
-
-  const handleCloseModal = () => {
-    setShowModal(false);
+  // Fonction pour gérer le changement de section
+  const handleSectionChange = (section) => {
+    console.log("Changement de section vers:", section);
+    setActiveSection(section);
   };
 
   return (
-      <div>
-        {/* Barre supérieure pour la connexion/déconnexion */}
-        <div
-            className="fixed top-0 left-0 w-full flex justify-between items-center p-6 z-50"
-            style={{ backgroundColor: "rgba(255, 87, 34, 0.9)" }}
-        >
-          <h1 className="text-2xl text-white font-bold">Papa Louis</h1>
-
-          {/* Boutons d'actions */}
-          <div className="space-x-4">
-            {/* Bouton pour afficher/masquer le MenuPizza */}
-            <Button
-                text={showMenuPizza ? "Fermer le menu" : "Menu"}
-                color="border-1 border-white bg-orange-900 hover:bg-orange-800 hover:border-3 text-white"
-                onClick={() => setShowMenuPizza(!showMenuPizza)} // Alterne l'état d'affichage
-            />
-            {estConnecte ? (
-                <Button
-                    text="Se déconnecter"
-                    color="border-1 border-white bg-orange-900 hover:bg-orange-800 hover:border-3 text-white"
-                    onClick={handleDeconnexion}
-                />
-            ) : (
-                <Button
-                    text="Se connecter"
-                    color="border-1 border-white bg-orange-900 hover:bg-orange-800 hover:border-3 text-white"
-                    onClick={handleShowModal}
-                />
-            )}
-          </div>
-          {showModal && <Connexion onClose={handleCloseModal} />}
-        </div>
-
-        {/* Affichage de MenuPizza si showMenuPizza est actif */}
-        {showMenuPizza && (
-            <div className="absolute top-40 left-0 right-0 bg-white z-40 overflow-y-auto p-4">
-              <MenuPizza />
-            </div>
+    <div className="fixed top-0 left-0 w-full flex items-center p-6 bg-orange-600 z-20">
+      <h1 
+        className="text-2xl text-white font-bold cursor-pointer" 
+        onClick={() => handleSectionChange("menu")}
+      >
+        Papa Louis
+      </h1>
+      <nav className="flex-grow">
+        <ul className="flex space-x-6 ml-6">
+          <li>
+            <button 
+              className="text-white hover:text-orange-300" 
+              onClick={() => handleSectionChange("pizzas")}
+            >
+              Nos pizzas
+            </button>
+          </li>
+          <li>
+            <button 
+              className="text-white hover:text-orange-300" 
+              onClick={() => handleSectionChange("panier")}
+            >
+              Panier
+            </button>
+          </li>
+          <li>
+            <button 
+              className="text-white hover:text-orange-300" 
+              onClick={() => handleSectionChange("profil")}
+            >
+              Profil
+            </button>
+          </li>
+        </ul>
+      </nav>
+      <div className="ml-auto">
+        {estConnecteLocal ? (
+          <Button
+            text="Se déconnecter"
+            color="border-1 border-white bg-orange-900 hover:bg-orange-800 hover:border-3 text-white"
+            onClick={handleDeconnexion}
+          />
+        ) : (
+          <Button
+            text="Se connecter"
+            color="border-1 border-white bg-orange-900 hover:bg-orange-800 hover:border-3 text-white"
+            onClick={() => setShowModal(true)}
+          />
         )}
       </div>
+      {showModal && (
+        <Connexion 
+          onClose={() => setShowModal(false)} 
+          setEstConnecte={typeof setEstConnecte === 'function' ? setEstConnecte : null}
+        />
+      )}
+    </div>
   );
 };
 
