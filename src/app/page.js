@@ -1,5 +1,5 @@
 "use client";
-import React, { useEffect, useState, useCallback } from "react";
+import React, { useEffect, useState } from "react";
 import MenuClient from "./component/menu/MenuClient";
 import API_ROUTES from "./configAPIRoute";
 import imagePizza from "../../public/image/pizza.jpg";
@@ -56,23 +56,26 @@ export default function Home() {
             console.error("Erreur de décodage du token:", error);
           }
         }
-      } catch (error) {
-        console.error("Erreur lors de la récupération des données :", error);
+      }
+      catch (error) {
+        console.error("Erreur lors de la récupération des données:", error);
       }
     };
 
     fetchData();
-  }, [estConnecte]); // Ajouter estConnecte comme dépendance
+  }, [estConnecte]);
 
   // Fonction de débogage pour afficher ce qui est rendu
   const renderDebug = () => {
     return (
       <div className="fixed bottom-0 right-0 bg-white p-2 text-black z-50 text-xs">
-        Section active: {activeSection}
-        <br />
-        Connecté: {estConnecte ? "Oui" : "Non"}
-        <br />
-        UserId: {userId || "Non défini"}
+        <div>
+          Section active: {activeSection}
+          <br />
+          Connecté: {estConnecte ? "Oui" : "Non"}
+          <br />
+          UserId: {userId || "Non défini"}
+        </div>
       </div>
     );
   };
@@ -124,6 +127,7 @@ export default function Home() {
               estConnecte={estConnecte}
               userId={userId}
               ingredients={ingredients}
+              setActiveSection={setActiveSection}
             />
           </div>
         )}
