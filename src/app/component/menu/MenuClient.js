@@ -5,7 +5,7 @@ import Connexion from "../connexion/Connexion";
 import PROXY_ROUTES from "@/app/configProxyRoute";
 import { getCookie } from "cookies-next";
 
-const MenuClient = ({ setActiveSection, setEstConnecte }) => {
+const MenuClient = ({ setActiveSection, setEstConnecte,fusionPanier }) => {
   const [showModal, setShowModal] = useState(false);
   const [estConnecteLocal, setEstConnecteLocal] = useState(false);
 
@@ -104,6 +104,7 @@ const MenuClient = ({ setActiveSection, setEstConnecte }) => {
         <Connexion 
           onClose={() => setShowModal(false)} 
           setEstConnecte={typeof setEstConnecte === 'function' ? setEstConnecte : null}
+          fusionPanier={fusionPanier}
         />
       )}
     </div>

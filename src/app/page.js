@@ -5,7 +5,7 @@ import API_ROUTES from "./configAPIRoute";
 import imagePizza from "../../public/image/pizza.jpg";
 import PanierClient from "./component/client/PanierClient";
 import AffichagePizzas from "./component/pizza/AffichagePizza";
-import { getCookie } from "cookies-next";
+import { getCookie,deleteCookie } from "cookies-next";
 import { jwtDecode } from "jwt-decode";
 
 export default function Home() {
@@ -86,6 +86,85 @@ export default function Home() {
     setEstConnecte(isConnected);
   };
 
+  const fusionPanier = async (userId) => {
+    try {
+      const panierCookie = getPanierFromCookie();
+      
+      if (!panierCookie || panierCookie.length === 0) {
+        console.log("Aucun panier dans les cookies à fusionner");
+        return { success: true, message: "Aucun panier à fusionner" };
+      }
+      
+      const panierDto = {
+        pizzaCommandeIds: [],
+      };
+      
+      for (const item of panierCookie) {
+        const pizzaCommandeResponse = await fetch(`${API_ROUTES.PIZZA_COMMANDE}`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${getCookie("AuthToken")}`
+          },
+          body: JSON.stringify({
+            pizzaId: item.pizzaId,
+            quantite: item.quantite,
+            ingredientsOptionnelsIds: item.ingredientsOptionnelsIds || []
+          })
+        });
+        
+        const pizzaCommandeData = await pizzaCommandeResponse.json();
+        
+        if (pizzaCommandeData.success && pizzaCommandeData.data) {
+          panierDto.pizzaCommandeIds.push(pizzaCommandeData.data.id);
+        } else {
+          console.error("Erreur lors de la création de la pizzaCommande:", pizzaCommandeData.message);
+          return { success: false, message: "Erreur lors de la fusion du panier" };
+        }
+      }
+      
+      // Appel à l'API pour fusionner les paniers
+      const response = await fetch(`${API_ROUTES.PANIER}/fusion/${userId}`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${getCookie("AuthToken")}`
+        },
+        body: JSON.stringify(panierDto)
+      });
+      
+      const data = await response.json();
+      
+      if (data.success) {
+        clearPanierCookie();
+        return { success: true, message: "Panier fusionné avec succès", data: data.data };
+      } else {
+        return { success: false, message: data.message || "Erreur lors de la fusion du panier" };
+      }
+    } catch (error) {
+      console.error("Erreur lors de la fusion du panier:", error);
+      return { success: false, message: "Une erreur est survenue lors de la fusion du panier" };
+    }
+  };
+  
+  const getPanierFromCookie = () => {
+    const panierCookie = getCookie("panier");
+    
+    if (panierCookie) {
+      try {
+        return JSON.parse(panierCookie);
+      } catch (error) {
+        console.error("Erreur lors du parsing du panier cookie:", error);
+        return [];
+      }
+    }
+    return [];
+  };
+  
+  const clearPanierCookie = () => {
+    deleteCookie("panier");
+  };
+
   return (
     <div className="relative min-h-screen">
       {/* Section du fond */}
@@ -99,6 +178,7 @@ export default function Home() {
         <MenuClient
           setActiveSection={setActiveSection}
           setEstConnecte={updateConnectionState}
+          fusionPanier={fusionPanier}
         />
       </div>
 

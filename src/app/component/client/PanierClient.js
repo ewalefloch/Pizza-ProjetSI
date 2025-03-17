@@ -189,6 +189,30 @@ const PanierClient = ({ estConnecte, userId, ingredients, setActiveSection }) =>
     fetchPanier();
   }, [estConnecte, userId]);
 
+  const handleValiderPanier = async () => {
+    if (panierItems.length === 0) return;
+  
+    try {
+      const response = await fetch(`${API_ROUTES.PANIER}/valider/${userId}`, {
+        method: "POST",
+        credentials: "include",
+      });
+  
+      const data = await response.json();
+      
+      if (response.ok && data.success) {
+        alert("Votre panier a été validé avec succès !");
+        await fetchPanier();
+      } else {
+        alert("Erreur lors de la validation du panier. Veuillez réessayer.");
+      }
+    } catch (error) {
+      console.error("Erreur lors de la validation du panier :", error);
+      alert("Une erreur s'est produite. Vérifiez votre connexion et réessayez.");
+    }
+  };
+  
+
   const supprimerDuPanier = async (itemId) => {
     try {
       if (estConnecte) {
@@ -340,7 +364,8 @@ const PanierClient = ({ estConnecte, userId, ingredients, setActiveSection }) =>
 
           <div className="mt-6">
             {estConnecte ? (
-              <button className="w-full bg-orange-600 text-white py-3 px-4 rounded-lg font-bold text-lg hover:bg-orange-500 transition transform hover:-translate-y-1 shadow-md hover:shadow-lg">
+              <button className="w-full bg-orange-600 text-white py-3 px-4 rounded-lg font-bold text-lg hover:bg-orange-500 transition transform hover:-translate-y-1 shadow-md hover:shadow-lg"
+                onClick={handleValiderPanier}>
                 Valider ma commande
               </button>
             ) : (

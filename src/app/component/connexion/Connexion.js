@@ -3,7 +3,7 @@ import React, { useState } from "react";
 import SeConnecter from "./SeConnecter";
 import CreerCompte from "./CreerCompte";
 
-const Connexion = ({ onClose, setEstConnecte }) => {
+const Connexion = ({ onClose, setEstConnecte,fusionPanier }) => {
   const [isLogin, setIsLogin] = useState(true);
 
   // Fonction à passer à SeConnecter pour gérer la connexion réussie
@@ -25,7 +25,7 @@ const Connexion = ({ onClose, setEstConnecte }) => {
         </h2>
         
         {isLogin ? (
-          <SeConnecter onSuccess={handleLoginSuccess} />
+          <SeConnecter onSuccess={handleLoginSuccess} fusionPanier={{ fusionPanier }} />
         ) : (
           <CreerCompte onSuccess={() => setIsLogin(true)} />
         )}
