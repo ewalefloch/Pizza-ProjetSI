@@ -25,7 +25,7 @@ const Connexion = ({ onClose, setEstConnecte,fusionPanier }) => {
         </h2>
         
         {isLogin ? (
-          <SeConnecter onSuccess={handleLoginSuccess} fusionPanier={{ fusionPanier }} />
+          <SeConnecter onSuccess={handleLoginSuccess} fusionPanier={ fusionPanier} />
         ) : (
           <CreerCompte onSuccess={() => setIsLogin(true)} />
         )}

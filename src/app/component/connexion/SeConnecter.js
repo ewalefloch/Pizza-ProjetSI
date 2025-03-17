@@ -45,14 +45,13 @@ const SeConnecter = ({fusionPanier}) => {
                 const decodedToken = jwtDecode(token);  
                 const userId = decodedToken.userId; 
                 console.log("ID de l'utilisateur depuis le token:", userId);
+                await fusionPanier(userId);
                 await gestionPanier(userId);
             }
 
             setMessage({ type: "success", text: "Connexion réussie !" });
             setNom("");
             setMdp("");
-
-
 
             setTimeout(() => {
                 window.location.reload(); // Recharge la page actuelle
