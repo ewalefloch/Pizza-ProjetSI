@@ -5,6 +5,8 @@ import API_ROUTES from "../configAPIRoute";
 import GestionPizzas from "../component/gestionPizza/GestionPizzas";
 import GestionIngredients from "../component/gestionIngredient/GestionIngredient";
 import GestionCommentaires from "../component/gestionCommentaire/GestionCommentaire";
+import GestionStatistique from "../component/Statistique/GestionStatistique";
+import GestionUtilisateurs from "../component/gestionCompte/GestionUtilisateurs";
 
 export default function Home() {
   const [pizzas, setPizzas] = useState([]);
@@ -104,6 +106,13 @@ export default function Home() {
           <GestionCommentaires pizzas={pizzas} />
         )}
 
+        {activeSection === "statitisques" && (
+          <GestionStatistique />
+        )}
+
+        {activeSection === "comptes" && (
+          <GestionUtilisateurs />
+        )}
       </div>
     </div>
   );

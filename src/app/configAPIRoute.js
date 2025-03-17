@@ -10,6 +10,7 @@ const API_ROUTES = {
     USERS: `${API_ROUTE}/users`,
     PIZZA_COMMANDE: `${API_ROUTE}/pizzaCommande`,
     PANIER: `${API_ROUTE}/panier`,
+    STATISTIQUE: `${API_ROUTE}/statistiques`,
 }
 
 export default API_ROUTES;
