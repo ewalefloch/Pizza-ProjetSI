@@ -125,7 +125,7 @@ const PanierClient = ({ estConnecte, userId, ingredients, setActiveSection }) =>
 
                 return {
                   ...pizzaCommandeData.data,
-                  pizza: pizzaData.data, // Associer la pizza complète
+                  pizza: pizzaData.data,
                 };
               } catch (error) {
                 console.error("Erreur lors de la récupération de la pizza:", error);
@@ -406,7 +406,7 @@ const PanierClient = ({ estConnecte, userId, ingredients, setActiveSection }) =>
           </p>
           <button
             className="px-6 py-3 bg-orange-600 text-white rounded-lg hover:bg-orange-500 transition transform hover:-translate-y-1 shadow-md"
-            onClick={() => setActiveSection("menu")}
+            onClick={() => setActiveSection("pizzas")}
           >
             Voir le Menu
           </button>
