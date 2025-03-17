@@ -7,6 +7,7 @@ import PanierClient from "./component/client/PanierClient";
 import AffichagePizzas from "./component/pizza/AffichagePizza";
 import { getCookie,deleteCookie } from "cookies-next";
 import { jwtDecode } from "jwt-decode";
+import Profil from "./component/client/profil";
 
 export default function Home() {
   const [pizzas, setPizzas] = useState([]);
@@ -14,6 +15,7 @@ export default function Home() {
   const [activeSection, setActiveSection] = useState("menu");
   const [estConnecte, setEstConnecte] = useState(false);
   const [userId, setUserId] = useState(null);
+  const [estClient, setEstClient] = useState(null);
 
   console.log("Section active:", activeSection); // Débogage
 
@@ -50,8 +52,10 @@ export default function Home() {
           try {
             const decodedToken = jwtDecode(token);
             const userId = decodedToken.userId;
+            const estClient = decodedToken.estClient;
             console.log("ID de l'utilisateur depuis le token:", userId);
             setUserId(userId);
+            setEstClient(estClient);
           } catch (error) {
             console.error("Erreur de décodage du token:", error);
           }
@@ -75,6 +79,8 @@ export default function Home() {
           Connecté: {estConnecte ? "Oui" : "Non"}
           <br />
           UserId: {userId || "Non défini"}
+          <br />
+          Client ?: {estClient ? "Oui" : "Non"}
         </div>
       </div>
     );
@@ -192,6 +198,11 @@ export default function Home() {
             />
           </div>
         )}
+        {activeSection === "profil" && <Profil
+            userId={userId}
+            estClient={estClient}
+        />}
+
       </div>
 
       {renderDebug()}
