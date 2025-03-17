@@ -8,6 +8,8 @@ const API_ROUTES = {
     LOGIN: `${API_ROUTE}/login`,
     REGISTER: `${API_ROUTE}/register`,
     USERS: `${API_ROUTE}/users`,
+    PIZZA_COMMANDE: `${API_ROUTE}/pizzaCommande`,
+    PANIER: `${API_ROUTE}/panier`,
 }
 
 export default API_ROUTES;
