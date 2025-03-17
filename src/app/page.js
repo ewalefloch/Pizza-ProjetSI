@@ -88,6 +88,7 @@ export default function Home() {
 
   const fusionPanier = async (userId) => {
     try {
+      // Récupérer le panier depuis les cookies
       const panierCookie = getPanierFromCookie();
       
       if (!panierCookie || panierCookie.length === 0) {
@@ -95,50 +96,30 @@ export default function Home() {
         return { success: true, message: "Aucun panier à fusionner" };
       }
       
-      const panierDto = {
-        pizzaCommandeIds: [],
-      };
+      console.log("Panier cookie à fusionner:", panierCookie);
       
-      for (const item of panierCookie) {
-        const pizzaCommandeResponse = await fetch(`${API_ROUTES.PIZZA_COMMANDE}`, {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-            'Authorization': `Bearer ${getCookie("AuthToken")}`
-          },
-          body: JSON.stringify({
-            pizzaId: item.pizzaId,
-            quantite: item.quantite,
-            ingredientsOptionnelsIds: item.ingredientsOptionnelsIds || []
-          })
-        });
-        
-        const pizzaCommandeData = await pizzaCommandeResponse.json();
-        
-        if (pizzaCommandeData.success && pizzaCommandeData.data) {
-          panierDto.pizzaCommandeIds.push(pizzaCommandeData.data.id);
-        } else {
-          console.error("Erreur lors de la création de la pizzaCommande:", pizzaCommandeData.message);
-          return { success: false, message: "Erreur lors de la fusion du panier" };
-        }
-      }
-      
-      // Appel à l'API pour fusionner les paniers
-      const response = await fetch(`${API_ROUTES.PANIER}/fusion/${userId}`, {
+      // Envoyer directement les données du panier cookie au serveur
+      const response = await fetch(`${API_ROUTES.PANIER}/fusion-cookie/${userId}`, {
         method: 'POST',
+        credentials: 'include',
         headers: {
           'Content-Type': 'application/json',
           'Authorization': `Bearer ${getCookie("AuthToken")}`
         },
-        body: JSON.stringify(panierDto)
+        body: JSON.stringify({
+          pizzaCommandes: panierCookie
+        })
       });
       
       const data = await response.json();
       
       if (data.success) {
+        // Supprimer le panier des cookies après fusion réussie
         clearPanierCookie();
-        return { success: true, message: "Panier fusionné avec succès", data: data.data };
+        console.log("Fusion du panier réussie:", data.message);
+        return { success: true, message: data.message, data: data.data };
       } else {
+        console.error("Échec de la fusion du panier:", data.message);
         return { success: false, message: data.message || "Erreur lors de la fusion du panier" };
       }
     } catch (error) {
