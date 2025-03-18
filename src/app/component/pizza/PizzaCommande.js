@@ -7,6 +7,7 @@ import { jwtDecode } from "jwt-decode";
 const PizzaCommandeModal = ({ pizza, ingredients, onClose }) => {
   const [ingredientsSelectionnes, setIngredientsSelectionnes] = useState([]);
   const [prixTotal, setPrixTotal] = useState(pizza.prix);
+  const [quantite, setQuantite] = useState(1);
 
   const handleSelectionChange = (selectedIds) => {
     setIngredientsSelectionnes(selectedIds);
@@ -17,6 +18,19 @@ const PizzaCommandeModal = ({ pizza, ingredients, onClose }) => {
     }, 0);
 
     setPrixTotal(pizza.prix + prixOptionnels);
+  };
+
+  const incrementQuantite = () => {
+    setQuantite(prev => prev + 1);
+  };
+
+  const decrementQuantite = () => {
+    setQuantite(prev => (prev > 1 ? prev - 1 : 1));
+  };
+
+  const handleQuantiteChange = (e) => {
+    const value = parseInt(e.target.value, 10);
+    setQuantite(isNaN(value) || value < 1 ? 1 : value);
   };
 
   const fetchPanier = async () => {
@@ -50,16 +64,12 @@ const PizzaCommandeModal = ({ pizza, ingredients, onClose }) => {
   const ajouterPizzaAuPanier = async () => {
     const userToken = getCookie("AuthToken");
 
-
-
     if (userToken) {
       try {
-        await fetchPanier();
-
         const panierId = await fetchPanier();
         const pizzaCommande = {
           pizzaId: pizza.id,
-          quantite: 1,
+          quantite: quantite,
           ingredientsOptionnelsIds: ingredientsSelectionnes,
           panierId: panierId,
         };
@@ -90,7 +100,7 @@ const PizzaCommandeModal = ({ pizza, ingredients, onClose }) => {
     } else {
       const pizzaCommande = {
         pizzaId: pizza.id,
-        quantite: 1,
+        quantite: quantite,
         ingredientsOptionnelsIds: ingredientsSelectionnes,
         panierId: 0,
       };
@@ -203,7 +213,7 @@ const PizzaCommandeModal = ({ pizza, ingredients, onClose }) => {
               </div>
               <p className="text-gray-700">Prix de base : {pizza.prix} €</p>
               <p className="text-lg font-bold mt-4">
-                Prix total : {prixTotal.toFixed(2)} €
+                Prix total : {(prixTotal * quantite).toFixed(2)} €
               </p>
 
               <div className="mt-2 text-xs text-gray-500">
@@ -243,6 +253,30 @@ const PizzaCommandeModal = ({ pizza, ingredients, onClose }) => {
           >
             Annuler
           </button>
+          
+          {/* Contrôle de quantité amélioré */}
+          <div className="flex items-center">
+            <button
+              className="w-8 h-8 flex items-center justify-center bg-orange-500 text-white rounded-l hover:bg-orange-600 transition"
+              onClick={decrementQuantite}
+            >
+              -
+            </button>
+            <input
+              type="number"
+              className="w-12 h-8 px-2 py-1 border text-center focus:outline-none"
+              value={quantite}
+              onChange={handleQuantiteChange}
+              min="1"
+            />
+            <button
+              className="w-8 h-8 flex items-center justify-center bg-orange-500 text-white rounded-r hover:bg-orange-600 transition"
+              onClick={incrementQuantite}
+            >
+              +
+            </button>
+          </div>
+          
           <button
             className="px-4 py-2 bg-orange-600 text-white rounded hover:bg-green-700 transition"
             onClick={ajouterPizzaAuPanier}

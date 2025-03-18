@@ -1,9 +1,9 @@
 "use client";
-import React from "react";
+import React, { useState } from "react";
 import PizzaImage from "./PizzaImage";
 import PizzaInfo from "./PizzaInfo";
 
-const PizzaCard = ({ pizza, ouvrirModalPizzaCommande, ouvrirModalCommentaire }) => {
+const PizzaCard = ({ pizza, ouvrirModalPizzaCommande, ouvrirModalCommentaire}) => {
     return (
         <div className="bg-white rounded-lg shadow-lg overflow-hidden transform transition duration-300 hover:scale-105">
             <PizzaImage photo={pizza.photo} nom={pizza.nom} />

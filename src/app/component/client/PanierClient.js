@@ -40,11 +40,9 @@ const PanierClient = ({ estConnecte, userId, ingredients, setActiveSection }) =>
   const fetchPanier = async () => {
     setIsLoading(true);
     try {
-      // Si l'utilisateur n'est pas connecté, utiliser directement les données du cookie
       if (!estConnecte || !userId) {
         const cookiePanier = getPanierFromCookies();
         
-        // Récupérer les pizzas disponibles de manière sécurisée
         let pizzasFromDB = [];
         try {
           pizzasFromDB = await fetchPizzas();
@@ -53,13 +51,11 @@ const PanierClient = ({ estConnecte, userId, ingredients, setActiveSection }) =>
           console.error("Impossible de récupérer les pizzas:", error);
         }
         
-        // Transformer le panier cookie pour avoir le même format que le panier connecté
         const cookiePanierTransformed = cookiePanier.map(item => {
-          // Trouver la pizza correspondante dans la liste des pizzas disponibles
           const matchingPizza = pizzasFromDB.find(p => p.id === item.pizzaId);
           
           return {
-            id: `cookie-${item.pizzaId}-${Date.now()}`, // ID unique pour permettre la suppression
+            id: `cookie-${item.pizzaId}-${Date.now()}`,
             pizzaId: item.pizzaId,
             quantite: item.quantite || 1,
             ingredientsOptionnelsIds: item.ingredientsOptionnelsIds || [],
@@ -162,7 +158,7 @@ const PanierClient = ({ estConnecte, userId, ingredients, setActiveSection }) =>
           const ingredient = getIngredientById(id);
           return sum + (ingredient ? ingredient.prix : 0);
         }, 0) || 0;
-      return total + prixPizza + prixIngredients;
+      return total + (prixPizza + prixIngredients) * item.quantite;
     }, 0);
   };
   
@@ -212,16 +208,69 @@ const PanierClient = ({ estConnecte, userId, ingredients, setActiveSection }) =>
     }
   };
   
+  const updateQuantite = async (itemId, newQuantity) => {
+    if (newQuantity < 1) {
+      newQuantity = 1;
+    }
+    
+    try {
+      const newItems = panierItems.map((item) => {
+        if (item.id === itemId) {
+          return { ...item, quantite: newQuantity };
+        }
+        return item;
+      });
+      
+      setPanierItems(newItems);
+      setTotalPrice(calculerTotal(newItems));
+  
+      if (estConnecte) {
+        const itemToUpdate = panierItems.find(item => item.id === itemId);
+        
+        if (itemToUpdate) {
+          const pizzaCommandeDto = {
+            id: itemToUpdate.id,
+            pizzaId: itemToUpdate.pizzaId, 
+            panierId: itemToUpdate.panierId, 
+            quantite: newQuantity,  
+            ingredientsOptionnelsIds: itemToUpdate.ingredientsOptionnelsIds 
+          };
+  
+          await fetch(`${API_ROUTES.PIZZA_COMMANDE}/${itemId}`, {
+            method: "PUT",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify(pizzaCommandeDto),
+            credentials: "include",
+          });
+        }
+      } else {
+        const cookiePanier = getPanierFromCookies();
+        const pizzaId = parseInt(itemId.split('-')[1]);
+        const itemToUpdate = cookiePanier.find(item => item.pizzaId === pizzaId);
+        
+        if (itemToUpdate) {
+          itemToUpdate.quantite = newQuantity;
+          setCookie("panier", JSON.stringify(cookiePanier));
+        }
+      }
+  
+    } catch (error) {
+      console.error("Erreur lors de la mise à jour de la quantité :", error);
+      fetchPanier(); 
+    }
+  };
+  
 
   const supprimerDuPanier = async (itemId) => {
     try {
-      if (estConnecte) {
+      if (estConnecte && !itemId.startsWith('cookie-')) {
         await fetch(`${API_ROUTES.PIZZA_COMMANDE}/${itemId}`, {
           method: "DELETE",
           credentials: "include",
         });
       } else {
-        // Pour les cookies, on doit extraire le vrai ID de pizza de notre ID généré "cookie-X-timestamp"
         const cookiePanier = getPanierFromCookies();
         
         if (itemId.startsWith('cookie-')) {
@@ -234,13 +283,15 @@ const PanierClient = ({ estConnecte, userId, ingredients, setActiveSection }) =>
       setPanierItems((prev) => prev.filter((item) => item.id !== itemId));
       setTotalPrice((prev) => {
         const removedItem = panierItems.find((item) => item.id === itemId);
+        if (!removedItem) return prev;
+        
         const itemPrice = removedItem?.pizza?.prix || 0;
         const itemIngredientsPrice =
           removedItem?.ingredientsOptionnelsIds?.reduce((sum, id) => {
             const ingredient = getIngredientById(id);
             return sum + (ingredient ? ingredient.prix : 0);
           }, 0) || 0;
-        return prev - itemPrice - itemIngredientsPrice;
+        return prev - (itemPrice + itemIngredientsPrice) * removedItem.quantite;
       });
     } catch (error) {
       console.error("Erreur lors de la suppression de la pizza :", error);
@@ -304,10 +355,36 @@ const PanierClient = ({ estConnecte, userId, ingredients, setActiveSection }) =>
                     {item.pizza?.nom || "Pizza inconnue"}
                   </span>
                   <span className="font-bold text-orange-600">
-                    {item.pizza?.prix ? item.pizza.prix.toFixed(2) : "0.00"}€
+                    {item.pizza?.prix ? (item.pizza.prix * item.quantite).toFixed(2) : "0.00"}€
                   </span>
                 </div>
-
+                <div className="flex items-center mt-2">
+                  <span className="text-sm text-gray-600 mr-2">Quantité:</span>
+                  <div className="flex items-center">
+                    <button
+                      className="w-8 h-8 flex items-center justify-center bg-orange-500 text-white rounded-l hover:bg-orange-600 transition"
+                      onClick={() => updateQuantite(item.id, Math.max(1, item.quantite - 1))}
+                    >
+                      -
+                    </button>
+                    <input
+                      type="number"
+                      className="w-16 h-8 px-2 py-1 border text-center focus:outline-none"
+                      value={item.quantite}
+                      onChange={(e) => {
+                        const newQuantity = parseInt(e.target.value) || 1;
+                        updateQuantite(item.id, newQuantity);
+                      }}
+                      min="1"
+                    />
+                    <button
+                      className="w-8 h-8 flex items-center justify-center bg-orange-500 text-white rounded-r hover:bg-orange-600 transition"
+                      onClick={() => updateQuantite(item.id, item.quantite + 1)}
+                    >
+                      +
+                    </button>
+                  </div>
+                </div>
                 {item.ingredientsOptionnelsIds?.length > 0 && (
                   <div className="mt-1">
                     <p className="text-sm font-medium text-gray-600">
