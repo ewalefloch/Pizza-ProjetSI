@@ -4,8 +4,9 @@ import Button from "../global/Bouton";
 import Connexion from "../connexion/Connexion";
 import PROXY_ROUTES from "@/app/configProxyRoute";
 import { getCookie } from "cookies-next";
+import { redirect } from "next/dist/server/api-utils";
 
-const MenuClient = ({ setActiveSection, setEstConnecte,fusionPanier }) => {
+const MenuClient = ({ setActiveSection, estConnecte,setEstConnecte, estClient,setEstClient,fusionPanier }) => {
   const [showModal, setShowModal] = useState(false);
   const [estConnecteLocal, setEstConnecteLocal] = useState(false);
 
@@ -28,9 +29,11 @@ const MenuClient = ({ setActiveSection, setEstConnecte,fusionPanier }) => {
 
       if (response.ok) {
         setEstConnecteLocal(false);
+
         // Vérifier si setEstConnecte est une fonction avant de l'appeler
         if (typeof setEstConnecte === 'function') {
-          setEstConnecte(false); // Mettre à jour l'état parent
+          setEstConnecte(false);
+          setEstClient(null);
         }
         console.log("Déconnexion réussie !");
         // Rediriger vers la page d'accueil après déconnexion
@@ -41,6 +44,10 @@ const MenuClient = ({ setActiveSection, setEstConnecte,fusionPanier }) => {
     } catch (err) {
       console.error("Erreur lors de la déconnexion :", err);
     }
+  };
+
+  const handleAdmin = () => {
+    window.location.href = "/admin";
   };
 
   // Fonction pour gérer le changement de section
@@ -75,7 +82,8 @@ const MenuClient = ({ setActiveSection, setEstConnecte,fusionPanier }) => {
               Panier
             </button>
           </li>
-          <li>
+          {estConnecte && (
+            <li>
             <button 
               className="text-white hover:text-orange-300" 
               onClick={() => handleSectionChange("profil")}
@@ -83,9 +91,17 @@ const MenuClient = ({ setActiveSection, setEstConnecte,fusionPanier }) => {
               Profil
             </button>
           </li>
+          )}
         </ul>
       </nav>
-      <div className="ml-auto">
+      <div className="ml-auto space-x-4">
+        {(estClient !== null) && !estClient && (
+          <Button
+            text="Admin"
+            color="border-1 border-white bg-orange-900 hover:bg-orange-800 hover:border-3 text-white"
+            onClick={() => handleAdmin()}
+          />
+        )}
         {estConnecteLocal ? (
           <Button
             text="Se déconnecter"
