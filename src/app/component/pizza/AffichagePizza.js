@@ -5,6 +5,7 @@ import API_ROUTES from "@/app/configAPIRoute";
 import PizzaCard from "./PizzaCard";
 import SidebarIngredients from "./SideBarIngredient";
 import PizzaCommandeModal from "./PizzaCommande";
+import ListeCommentairesPizza from "../commentaire/ListeCommentairesPizza";
 
 const AffichagePizzas = () => {
     const [pizzas, setPizzas] = useState([]);
@@ -12,8 +13,8 @@ const AffichagePizzas = () => {
     const [ingredients, setIngredients] = useState([]);
     const [selectedIngredients, setSelectedIngredients] = useState([]);
     const [selectedPizza, setSelectedPizza] = useState(null);
-    const [showModal, setShowModal] = useState(false);
-
+    const [showModalPizzaCommande, setShowModalPizzaCommande] = useState(false);
+    const [showModalCommentaire, setShowModalCommentaire] = useState(false);
     useEffect(() => {
         const fetchData = async () => {
             try {
@@ -36,13 +37,23 @@ const AffichagePizzas = () => {
         fetchData();
     }, []);
 
-    const ouvrirModal = (pizza) => {
+    const ouvrirModalPizzaCommande = (pizza) => {
         setSelectedPizza(pizza);
-        setShowModal(true);
+        setShowModalPizzaCommande(true);
     };
 
-    const fermerModal = () => {
-        setShowModal(false);
+    const fermerModalCommande = () => {
+        setShowModalPizzaCommande(false);
+        setSelectedPizza(null);
+    };
+
+    const ouvrirModalCommentaire = (pizza) => {
+        setSelectedPizza(pizza);
+        setShowModalCommentaire(true);
+    };
+
+    const fermerModalCommentaire = () => {
+        setShowModalCommentaire(false);
         setSelectedPizza(null);
     };
 
@@ -58,7 +69,7 @@ const AffichagePizzas = () => {
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                     {filteredPizzas.length > 0 ? (
                         filteredPizzas.map((pizza) => (
-                            <PizzaCard key={pizza.id} pizza={pizza} ouvrirModal={ouvrirModal} />
+                            <PizzaCard key={pizza.id} pizza={pizza} ouvrirModalPizzaCommande={ouvrirModalPizzaCommande} ouvrirModalCommentaire={ouvrirModalCommentaire}/>
                         ))
                     ) : (
                         <div className="col-span-full text-center py-8">
@@ -68,12 +79,19 @@ const AffichagePizzas = () => {
                 </div>
             </div>
 
-            {showModal && selectedPizza && (
+            {showModalPizzaCommande && selectedPizza && (
                 <PizzaCommandeModal 
                     pizza={selectedPizza} 
                     ingredients={ingredients} 
-                    onClose={fermerModal} 
+                    onClose={fermerModalCommande} 
                 />
+            )}
+
+            {showModalCommentaire && selectedPizza && (
+                <ListeCommentairesPizza
+                    pizza={selectedPizza}
+                    onClose={fermerModalCommentaire}
+                />    
             )}
         </div>
     );
