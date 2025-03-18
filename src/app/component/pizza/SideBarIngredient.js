@@ -1,7 +1,7 @@
 import React from 'react';
 import IngredientFilterCheckbox from './IngredientFilterCheckbox';
 
-const SidebarIngredients = ({ ingredients, selectedIngredients, filtrerPizzas }) => {
+const SidebarIngredients = ({ ingredients, selectedIngredients, setSelectedIngredients}) => {
     return (
         <div className="w-64 bg-white shadow-lg p-4">
             <h2 className="text-xl font-bold text-orange-800 mb-4">Filtrer par ingrédient</h2>
@@ -11,7 +11,7 @@ const SidebarIngredients = ({ ingredients, selectedIngredients, filtrerPizzas })
                         key={`ingredient-${ingredient.id}`} 
                         ingredient={ingredient} 
                         selectedIngredients={selectedIngredients} 
-                        filtrerPizzas={filtrerPizzas} 
+                        setSelectedIngredients={setSelectedIngredients}
                     />
                 ))}
             </div>

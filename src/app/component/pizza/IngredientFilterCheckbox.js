@@ -1,8 +1,13 @@
 import React from 'react';
 
-const IngredientFilterCheckbox = ({ ingredient, selectedIngredients, filtrerPizzas }) => {
+const IngredientFilterCheckbox = ({ ingredient, selectedIngredients,setSelectedIngredients }) => {
     const handleChange = () => {
-        filtrerPizzas(ingredient.id);
+        setSelectedIngredients((prevState) => {
+            if (prevState.includes(ingredient.id)) {
+                return prevState.filter((id) => id !== ingredient.id);
+            }
+            return [...prevState, ingredient.id];
+        });
     };
 
     return (

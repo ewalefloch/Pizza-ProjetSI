@@ -44,6 +44,7 @@ const ListeCommande = ({ userId, onClose }) => {
     <div
       className="fixed inset-0 flex items-center justify-center z-50"
       style={{ backgroundColor: "rgba(255, 87, 34, 0.9)" }}
+      onClick={onClose}
     >
       <div className="bg-white p-6 rounded-lg shadow-lg w-full max-w-2xl max-h-screen overflow-y-auto">
         <h2 className="text-2xl font-bold mb-4">Mes Commandes</h2>
