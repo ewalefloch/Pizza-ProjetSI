@@ -17,8 +17,6 @@ export default function Home() {
   const [userId, setUserId] = useState(null);
   const [estClient, setEstClient] = useState(null);
 
-  console.log("Section active:", activeSection); // Débogage
-
   useEffect(() => {
     const fetchData = async () => {
       try {
@@ -164,8 +162,11 @@ export default function Home() {
       <div className="relative z-10">
         <MenuClient
           setActiveSection={setActiveSection}
+          estConnecte={estConnecte}
           setEstConnecte={updateConnectionState}
           fusionPanier={fusionPanier}
+          estClient={estClient}
+          setEstClient={setEstClient}
         />
       </div>
 
@@ -188,7 +189,7 @@ export default function Home() {
           </div>
         )}
         {/* Panier */}
-        {activeSection === "panier" && (
+        {activeSection === "panier"  && (
           <div className="pt-4 px-4">
             <PanierClient
               estConnecte={estConnecte}
@@ -198,7 +199,7 @@ export default function Home() {
             />
           </div>
         )}
-        {activeSection === "profil" && <Profil
+        {(activeSection === "profil" && estConnecte) && <Profil
             userId={userId}
             estClient={estClient}
         />}
