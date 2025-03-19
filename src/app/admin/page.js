@@ -7,18 +7,56 @@ import GestionIngredients from "../component/gestionIngredient/GestionIngredient
 import GestionCommentaires from "../component/gestionCommentaire/GestionCommentaire";
 import GestionStatistique from "../component/Statistique/GestionStatistique";
 import GestionUtilisateurs from "../component/gestionCompte/GestionUtilisateurs";
+import {getCookie} from "cookies-next";
+import {jwtDecode} from "jwt-decode";
 
 export default function Home() {
-  const [pizzas, setPizzas] = useState([]);
+    const [estConnecte, setEstConnecte] = useState(false);
+    const [estClient, setEstClient] = useState(null);
+    const [pizzas, setPizzas] = useState([]);
   const [ingredients, setIngredients] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
-  const [activeSection, setActiveSection] = useState("pizzas"); 
+  const [activeSection, setActiveSection] = useState("pizzas");
 
-  // Charger les pizzas et ingrédients
-    useEffect(() => {
+
+    // Charger les pizzas et ingrédients
+    useEffect(async () => {
+
+        const verifierAuthentification = () => {
+            const token = getCookie("AuthToken");
+            const isConnected = !!token;
+            setEstConnecte(isConnected);
+
+            if (isConnected && token) {
+                return Promise.resolve()
+                    .then(() => {
+                        const decodedToken = jwtDecode(token);
+                        const estClient = decodedToken.estClient; // Exemple : propriété issue du token
+                        setEstClient(estClient);
+
+                        // Rediriger vers la page d'accueil si l'utilisateur n'est pas un admin
+                        if (estClient) {
+                            window.location.href = "/";
+                            // Redirige vers la page d'accueil
+                        }
+                    })
+                    .catch((error) => {
+                        console.error("Erreur de décodage du token:", error);
+                        window.location.href = "/";
+                        // Redirige en cas de problème avec le token
+                    });
+            } else {
+                window.location.href = "/";
+                // Redirige si non connecté
+            }
+        };
+
+        verifierAuthentification()
+            .then(() => null);
+
         Promise.all([
-            fetch(API_ROUTES.PIZZA, { credentials: "include" }).then((response) => response.json()),
-            fetch(API_ROUTES.INGREDIENT, { credentials: "include" }).then((response) => response.json())
+            fetch(API_ROUTES.PIZZA, {credentials: "include"}).then((response) => response.json()),
+            fetch(API_ROUTES.INGREDIENT, {credentials: "include"}).then((response) => response.json())
         ])
             .then(([pizzasData, ingredientsData]) => {  // Mise à jour des ingrédients avec les images
                 const ingredientsWithImages = ingredientsData.data.map((ingredient) => ({
