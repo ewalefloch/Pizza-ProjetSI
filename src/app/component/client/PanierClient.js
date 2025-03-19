@@ -265,7 +265,7 @@ const PanierClient = ({ estConnecte, userId, ingredients, setActiveSection }) =>
 
   const supprimerDuPanier = async (itemId) => {
     try {
-      if (estConnecte && !itemId.startsWith('cookie-')) {
+      if (estConnecte) {
         await fetch(`${API_ROUTES.PIZZA_COMMANDE}/${itemId}`, {
           method: "DELETE",
           credentials: "include",
@@ -273,11 +273,9 @@ const PanierClient = ({ estConnecte, userId, ingredients, setActiveSection }) =>
       } else {
         const cookiePanier = getPanierFromCookies();
         
-        if (itemId.startsWith('cookie-')) {
           const pizzaId = parseInt(itemId.split('-')[1]);
           const newItems = cookiePanier.filter(item => item.pizzaId !== pizzaId);
           setCookie("panier", JSON.stringify(newItems));
-        }
       }
       
       setPanierItems((prev) => prev.filter((item) => item.id !== itemId));

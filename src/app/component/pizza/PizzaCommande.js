@@ -21,11 +21,11 @@ const PizzaCommandeModal = ({ pizza, ingredients, onClose }) => {
   };
 
   const incrementQuantite = () => {
-    setQuantite(prev => prev + 1);
+    setQuantite((prev) => prev + 1);
   };
 
   const decrementQuantite = () => {
-    setQuantite(prev => (prev > 1 ? prev - 1 : 1));
+    setQuantite((prev) => (prev > 1 ? prev - 1 : 1));
   };
 
   const handleQuantiteChange = (e) => {
@@ -111,6 +111,35 @@ const PizzaCommandeModal = ({ pizza, ingredients, onClose }) => {
     }
   };
 
+  // Fonction pour rendre le SVG d'un ingrédient
+  const renderIngredientSVG = (ingredient, index) => {
+    const posX = 30 + Math.random() * 140;
+    const posY = 30 + Math.random() * 140;
+    const rotation = Math.random() * 360;
+    if (ingredient.formeSvg) {
+      // Utiliser la forme SVG de la base de données
+      return (
+        <g
+          key={`ing-${ingredient.id}-${index}`}
+          transform={`translate(${posX}, ${posY}) rotate(${rotation})`}
+          dangerouslySetInnerHTML={{ __html: ingredient.formeSvg }}
+        />
+      );
+    } else {
+      // Fallback pour les ingrédients sans forme SVG définie
+      let color = "#000000";
+
+      return (
+        <g
+          key={`ing-${ingredient.id}-${index}`}
+          transform={`translate(${posX}, ${posY}) rotate(${rotation})`}
+        >
+          <rect x="-5" y="-5" width="10" height="10" fill={color} />
+        </g>
+      );
+    }
+  };
+
   return (
     <div className="fixed inset-0 flex items-center justify-center z-50">
       <div
@@ -156,62 +185,14 @@ const PizzaCommandeModal = ({ pizza, ingredients, onClose }) => {
                     const ingredient = ingredients.find((ing) => ing.id === id);
                     if (!ingredient) return null;
 
-                    return Array.from({ length: 8 }, (_, i) => {
-                      const posX = 30 + Math.random() * 140;
-                      const posY = 30 + Math.random() * 140;
-                      const rotation = Math.random() * 360;
-
-                      //TODO modifier pour que ca soit dynamique avec la bdd
-                      let color = "#000000";
-                      if (ingredient.nom.toLowerCase().includes("tomate"))
-                        color = "#FF6347";
-                      else if (
-                        ingredient.nom.toLowerCase().includes("champignon")
-                      )
-                        color = "#8B4513";
-                      else if (
-                        ingredient.nom.toLowerCase().includes("fromage") ||
-                        ingredient.nom.toLowerCase().includes("mozzarella")
-                      )
-                        color = "#FFFACD";
-                      else if (ingredient.nom.toLowerCase().includes("olive"))
-                        color = "#000000";
-                      else if (ingredient.nom.toLowerCase().includes("jambon"))
-                        color = "#FFC0CB";
-                      else if (ingredient.nom.toLowerCase().includes("chorizo"))
-                        color = "#D84315";
-                      else if (ingredient.nom.toLowerCase().includes("poivron"))
-                        color = "#4CAF50";
-                      else if (ingredient.nom.toLowerCase().includes("oignon"))
-                        color = "#AB47BC";
-
-                      return (
-                        <g
-                          key={`ing-${id}-${i}`}
-                          transform={`translate(${posX}, ${posY}) rotate(${rotation})`}
-                        >
-                          {ingredient.nom.toLowerCase().includes("olive") ? (
-                            <circle cx="0" cy="0" r="5" fill={color} />
-                          ) : ingredient.nom
-                              .toLowerCase()
-                              .includes("champignon") ? (
-                            <ellipse cx="0" cy="0" rx="7" ry="5" fill={color} />
-                          ) : (
-                            <rect
-                              x="-5"
-                              y="-5"
-                              width="10"
-                              height="10"
-                              fill={color}
-                            />
-                          )}
-                        </g>
-                      );
-                    });
+                    return Array.from({ length: 8 }, (_, i) =>
+                      renderIngredientSVG(ingredient, i)
+                    );
                   })}
                 </svg>
+                <p className="text-orange-600 mb-2 text-center p-1">Image non contractuelle</p>
               </div>
-              <p className="text-gray-700">Prix de base : {pizza.prix} €</p>
+              <p className="text-gray-700 mt-1">Prix de base : {pizza.prix} €</p>
               <p className="text-lg font-bold mt-4">
                 Prix total : {(prixTotal * quantite).toFixed(2)} €
               </p>
@@ -236,6 +217,7 @@ const PizzaCommandeModal = ({ pizza, ingredients, onClose }) => {
 
           {/* Partie droite : Liste d'ingrédients scrollable */}
           <div className="w-full md:w-1/2">
+          <h1 className="font-bold mb-2 text-orange-500 text-center">D'autres envies ?</h1>
             <div className="border rounded-lg p-4 h-72 md:h-96 overflow-y-auto">
               <h3 className="font-bold mb-2">Ingrédients optionnels</h3>
               <ListeIngredients
@@ -253,7 +235,7 @@ const PizzaCommandeModal = ({ pizza, ingredients, onClose }) => {
           >
             Annuler
           </button>
-          
+
           {/* Contrôle de quantité amélioré */}
           <div className="flex items-center">
             <button
@@ -276,7 +258,7 @@ const PizzaCommandeModal = ({ pizza, ingredients, onClose }) => {
               +
             </button>
           </div>
-          
+
           <button
             className="px-4 py-2 bg-orange-600 text-white rounded hover:bg-green-700 transition"
             onClick={ajouterPizzaAuPanier}
