@@ -1,6 +1,15 @@
 import React from "react";
+import API_ROUTES from "@/app/configAPIRoute";
 
 const TableauIngredients = ({ ingredients, supprimerIngredient }) => {
+  // Fonction pour obtenir l'URL de l'image d'un ingrédient
+  const getImageUrl = (ingredient) => {
+    if (ingredient.photo) {
+      return `${API_ROUTES.INGREDIENT}/images/${ingredient.id}`;
+    }
+    return "/image/ingredient.jpg";
+  };
+
   return (
     <div className="overflow-x-auto">
       <table className="min-w-full table-auto border-collapse border border-gray-400">
@@ -23,13 +32,13 @@ const TableauIngredients = ({ ingredients, supprimerIngredient }) => {
                 <td className="border border-gray-300 px-4 py-2">{ingredient.prix} €</td>
                 <td className="border border-gray-300 px-4 py-2">
                   <img
-                      src={ingredient.image || "/image/ingredient.jpg" }
-                      alt={`Image de ${ingredient.nom}`}
-                      className="w-12 h-12 object-cover"
-                      onError={(e) => e.currentTarget.src ="/image/ingredient.jpg"}
+                    src={getImageUrl(ingredient)}
+                    alt={`Image de ${ingredient.nom}`}
+                    className="w-12 h-12 object-cover"
+                    onError={(e) => e.currentTarget.src = "/image/ingredient.jpg"}
                   />
                 </td>
-                  <td className="border border-gray-300 px-4 py-2">
+                <td className="border border-gray-300 px-4 py-2">
                   <div
                     dangerouslySetInnerHTML={{ __html: ingredient.formeSvg }}
                     className="w-12 h-12"
@@ -47,7 +56,7 @@ const TableauIngredients = ({ ingredients, supprimerIngredient }) => {
             ))
           ) : (
             <tr key="aucun-ingredient">
-              <td colSpan="5" className="text-center px-4 py-2">Aucun ingrédient disponible</td>
+              <td colSpan="6" className="text-center px-4 py-2">Aucun ingrédient disponible</td>
             </tr>
           )}
         </tbody>
