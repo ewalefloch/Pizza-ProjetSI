@@ -100,6 +100,7 @@ const CreerUtilisateur = ({ onFermer, onAjouterUtilisateur }) => {
                 placeholder="Adresse email"
                 type="email"
                 value={adresseEmail}
+                pattern="[a-z0-9._%+-]+@[a-z0-9.-]+\.[a-z]"
                 onChange={(e) => setAdresseEmail(e.target.value)}
                 className="w-full p-2 border border-gray-300 rounded"
                 required

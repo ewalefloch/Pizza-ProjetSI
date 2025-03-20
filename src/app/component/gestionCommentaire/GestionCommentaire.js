@@ -10,7 +10,7 @@ const GestionCommentaires = ({ pizzas }) => {
 
   const supprimerCommentaire = async (id) => {
     try {
-      await fetch(`${API_ROUTES.COMMENTAIRE}/${id}`, { method: "DELETE" });
+      await fetch(`${API_ROUTES.COMMENTAIRE}/${id}`, { method: "DELETE" , credentials: "include"});
       setCommentaires((prev) => prev.filter((commentaire) => commentaire.id !== id));
     } catch (error) {
       console.error("Erreur suppression commentaire", error);

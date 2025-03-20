@@ -94,7 +94,7 @@ const SeConnecter = ({fusionPanier}) => {
     return (
         <form onSubmit={handleSubmit} className="space-y-4">
             <input
-                placeholder="Pseudo"
+                placeholder="Nom"
                 value={nom}
                 onChange={(e) => setNom(e.target.value)}
                 className="w-full p-2 border border-gray-300"
